@@ -1,11 +1,7 @@
 ﻿using System;
 using Android.App;
 using Android.OS;
-using Android.Runtime;
-using RefitExample;
-using Android.Support.Design.Widget;
 using Android.Support.V7.App;
-using Android.Views;
 using Android.Widget;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -14,22 +10,28 @@ using RefritExample;
 using Refit;
 using System.Collections.Generic;
 using Android.Util;
+using Android.Support.V7.Widget;
 
 namespace RefitExample
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
 
         private PokemonService pokemonService;
         private List<Pokemon> pokemons = new List<Pokemon>();
+        private RecyclerView pokeRecycler;
+        private PokemonAdapter adapter;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
-            Android.Support.V7.Widget.Toolbar toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
-            SetSupportActionBar(toolbar);
+
+            pokeRecycler = FindViewById<RecyclerView>(Resource.Id.recycler_poke);
+            pokeRecycler.HasFixedSize = true;
+            adapter = new PokemonAdapter(pokemons, this);
+            pokeRecycler.SetAdapter(adapter);
 
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings() {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(), Converters = { new StringEnumConverter() }
@@ -55,12 +57,7 @@ namespace RefitExample
                 MyResponse response = await pokemonService.getMyResponse();
                 pokemons = response.results;
 
-                foreach (Pokemon pokemon in pokemons)
-                {
-                    Toast.MakeText(this, "Pokemon Name: " + pokemon.name, ToastLength.Short).Show();
-                    Log.Debug("TAGG", pokemon.name);
-                }
-
+                adapter.setItems(pokemons);
 
             } catch (Exception e) {
                 Toast.MakeText(this, e.StackTrace, ToastLength.Long).Show();
