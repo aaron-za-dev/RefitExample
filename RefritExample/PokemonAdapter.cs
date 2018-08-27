@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
+﻿using System.Collections.Generic;
 using Android.Content;
-using Android.OS;
-using Android.Runtime;
 using Android.Support.V7.Widget;
 using Android.Views;
-using Android.Widget;
+using Square.Picasso;
 
 namespace RefitExample
 {
@@ -49,6 +41,16 @@ namespace RefitExample
             PokemonViewHolder pvh = holder as PokemonViewHolder;
             pvh.pokemonName.Text = pokemons[position].name;
 
+            string url = string.Concat("https://pokeapi.co/media/sprites/pokemon/", pokemons[position].getPokemonID(), ".png");
+
+            Picasso.
+                With(context).
+                Load(url).
+                Fit().
+                CenterCrop().
+                MemoryPolicy(MemoryPolicy.NoCache, MemoryPolicy.NoStore)
+                .NetworkPolicy(NetworkPolicy.NoCache, NetworkPolicy.NoStore)
+                .Into(pvh.imagePokemon);
         }
 
         public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
